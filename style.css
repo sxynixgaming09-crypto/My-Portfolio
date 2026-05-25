@@ -12,7 +12,8 @@ body{
     align-items:center;
     background:
     radial-gradient(circle at top,#312e81,#020617 60%);
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:auto;
     perspective:5000px;
 }
 
@@ -39,9 +40,18 @@ body::before{
 /* BOOK */
 .book{
     position:relative;
-    width:380px;
-    height:540px;
+    width:min(90vw, 380px);
+    aspect-ratio: 380 / 540;
+    height:auto;
     transform-style:preserve-3d;
+}
+
+.responsive-img{
+    width:100%;
+    max-width:350px;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:18px;
 }
 
 /* SHADOW */
@@ -67,6 +77,7 @@ body::before{
     transform-style:preserve-3d;
     cursor:grab;
     transition:transform 1s ease;
+    will-change: transform;
 }
 
 /* DRAGGING */
@@ -87,6 +98,7 @@ body::before{
     box-shadow:
     0 20px 50px rgba(0,0,0,.45),
     inset 0 0 20px rgba(255,255,255,.05);
+    transform: translateZ(0);
 }
 
 /* FRONT */
@@ -344,28 +356,56 @@ h2{
 }
 
 /* MOBILE */
-@media(max-width:500px){
+@media(max-width:768px){
+
+    body{
+        padding:30px 15px;
+    }
 
     .book{
-        width:300px;
-        height:450px;
+        width:95vw;
+    }
+
+    .content{
+        padding:25px;
     }
 
     .title{
-        font-size:32px;
+        font-size:28px;
+        line-height:1.2;
     }
 
     h2{
-        font-size:26px;
+        font-size:24px;
     }
 
-    .profile{
-        width:100px;
-        height:100px;
-        font-size:42px;
+    .role{
+        font-size:15px;
     }
 
     .desc{
+        font-size:13px;
+        line-height:1.6;
+    }
+
+    .profile{
+        width:90px;
+        height:90px;
+    }
+
+    .btn{
+        width:100%;
+        text-align:center;
+        padding:14px;
+    }
+
+    .skill{
+        padding:10px 16px;
+        font-size:12px;
+    }
+
+    .card{
+        padding:16px;
         font-size:14px;
     }
 }
