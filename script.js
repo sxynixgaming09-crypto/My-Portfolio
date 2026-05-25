@@ -1,48 +1,68 @@
 const pages = document.querySelectorAll(".page");
-    let isAnimating = false; // Prevents click spamming
-    
-    pages.forEach((page, index) => {
-        let flipped = false;
-    
-        // Set initial layout stacking
-        page.style.zIndex = pages.length - index;
-    
-        /* CLICK FUNCTION */
-        page.addEventListener("click", (e) => {
-            // Stop click tracking if a page is currently moving
-            if (isAnimating) return;
-            isAnimating = true;
-    
-            /* FLIP FORWARD (Left to Right) */
-            if (!flipped) {
-                page.style.transform = "rotateY(-180deg)";
-                flipped = true;
-    
-                // Wait until the flip finishes to lower the z-index
-                const resetForwardZ = () => {
-                    page.style.zIndex = index;
-                    isAnimating = false;
-                    page.removeEventListener("transitionend", resetForwardZ);
-                };
-                page.addEventListener("transitionend", resetForwardZ);
-            }
-            /* FLIP BACKWARD (Right to Left) */
-            else {
-                page.style.transform = "rotateY(0deg)";
-                flipped = false;
-    
-                // Give it a temporary mid-layer z-index so it doesn't instantly 
-                // overpower or reveal elements behind it incorrectly mid-flight
-                page.style.zIndex = pages.length + index;
-    
-                // Once it finishes flattening back to the right, reset to original stack
-                const resetBackwardZ = () => {
-                    page.style.zIndex = pages.length - index;
-                    isAnimating = false;
-                    page.removeEventListener("transitionend", resetBackwardZ);
-                };
-                page.addEventListener("transitionend", resetBackwardZ);
-            }
-        });
+
+let isAnimating = false;
+
+pages.forEach((page, index) => {
+
+    let flipped = false;
+
+    page.style.zIndex = pages.length - index;
+
+    function flipPage() {
+
+        if (isAnimating) return;
+
+        isAnimating = true;
+
+        if (!flipped) {
+
+            page.style.transform = "rotateY(-180deg)";
+            flipped = true;
+
+            const end = () => {
+                page.style.zIndex = index;
+                isAnimating = false;
+                page.removeEventListener("transitionend", end);
+            };
+
+            page.addEventListener("transitionend", end);
+
+        } else {
+
+            page.style.transform = "rotateY(0deg)";
+            flipped = false;
+
+            page.style.zIndex = pages.length + index;
+
+            const end = () => {
+                page.style.zIndex = pages.length - index;
+                isAnimating = false;
+                page.removeEventListener("transitionend", end);
+            };
+
+            page.addEventListener("transitionend", end);
+        }
+    }
+
+    // Desktop click
+    page.addEventListener("click", flipPage);
+
+    // Mobile swipe
+    let startX = 0;
+
+    page.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
     });
-      
+
+    page.addEventListener("touchend", (e) => {
+
+        let endX = e.changedTouches[0].clientX;
+
+        let diff = startX - endX;
+
+        if (Math.abs(diff) > 50) {
+            flipPage();
+        }
+    });
+
+});
